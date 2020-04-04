@@ -27,3 +27,6 @@ dependencies:
     version: 8.6.13
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.install
+
+maintainers:
+  - name: test
