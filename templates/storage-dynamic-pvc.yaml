@@ -1,0 +1,30 @@
+{{- if not .Values.storage.dynamicVolume.existingClaim -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+{{- if .Values.storage.dynamicVolume.annotations }}
+  annotations:
+{{ toYaml .Values.storage.dynamicVolume.annotations | indent 4 }}
+{{- end }}
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+  name: {{ template "iceci.fullname" . }}-dynamic
+spec:
+  accessModes:
+    - ReadWriteMany
+{{- if .Values.storage.dynamicVolume.storageClass }}
+{{- if (eq "-" .Values.storage.dynamicVolume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: {{ .Values.storage.dynamicVolume.storageClass | quote }}
+{{- end }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.dynamicVolume.size | quote }}
+  {{- if .Values.storage.dynamicVolume.hostPath }}
+  selector:
+    matchLabels:
+      name: {{ template "iceci.fullname" . }}-dynamic
+  {{- end -}}
+{{- end -}}

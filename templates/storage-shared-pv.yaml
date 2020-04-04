@@ -1,4 +1,5 @@
-{{- if and .Values.iceciOperator.persistence.sharedVolume.hostPath (not .Values.iceciOperator.persistence.sharedVolume.existingClaim) -}}
+{{- if and .Values.storage.sharedVolume.hostPath (not .Values.storage.sharedVolume.existingClaim) -}}
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -10,8 +11,8 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.iceciOperator.persistence.sharedVolume.size }}
+    storage: {{ .Values.storage.sharedVolume.size }}
   hostPath:
-    path: {{ .Values.iceciOperator.persistence.sharedVolume.hostPath | quote }}
+    path: {{ .Values.storage.sharedVolume.hostPath | quote }}
     type: DirectoryOrCreate
 {{- end -}}

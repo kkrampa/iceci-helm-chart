@@ -1,3 +1,4 @@
+{{- if .Values.iceciOperator.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -28,6 +29,7 @@ spec:
           image: "{{ .Values.iceciOperator.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.iceciOperator.image.pullPolicy }}
           env:
+          {{ include "iceci.dockerBuildEnvs" . | nindent 10 }}
           - name: ICE_NAMESPACE
             valueFrom:
               fieldRef:
@@ -42,12 +44,6 @@ spec:
             value: {{ include "iceci.fullname" . }}-dynamic
           - name: ICE_SHARED_PVC
             value: {{ include "iceci.fullname" . }}-shared
-          - name: ICE_IMAGE_KANIKO
-            value: "gcr.io/kaniko-project/executor:v0.16.0"
-          - name: ICE_IMAGE_UTILS
-            value: "iceci/utils:2"
-          - name: ICE_IMAGE_BUILDKIT
-            value: "moby/buildkit:v0.6.4-rootless"
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
@@ -62,3 +58,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+{{- end -}}

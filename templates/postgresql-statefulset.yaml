@@ -1,0 +1,52 @@
+{{- if and .Values.postgresql.enable .Values.enableUI -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "iceci.fullname" . }}-postgresql
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "iceci.fullname" . }}-postgresql-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "iceci.postgresql.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "iceci.postgresql.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: main
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ required ".Values.postgresql.image.repository" .Values.postgresql.image.repository }}:{{ required ".Values.postgersq.image.tag" .Values.postgresql.image.tag }}
+          imagePullPolicy: {{ required ".Values.postgersq.image.pullPolicy" .Values.postgresql.image.pullPolicy }}
+          env:
+          - name: POSTGRES_PASSWORD
+            value: {{ required ".Values.database.password" .Values.database.password }}
+          - name: POSTGRES_USER
+            value: {{ required ".Values.database.user" .Values.database.user }}
+          - name: POSTGRES_DB
+            value: {{ required ".Values.database.dbName" .Values.database.dbName }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+{{- end -}}

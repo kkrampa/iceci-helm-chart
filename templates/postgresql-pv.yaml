@@ -1,0 +1,19 @@
+{{- if and .Values.postgresql.enable .Values.enableUI -}}
+{{- if and .Values.postgresql.persistence.hostPath (not .Values.postgresql.persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+    name: {{ template "iceci.fullname" . }}-postgresql
+  name: {{ template "iceci.fullname" . }}-postgresql
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ .Values.storage.dynamicVolume.size }}
+  hostPath:
+    path: {{ .Values.storage.dynamicVolume.hostPath | quote }}
+    type: DirectoryOrCreate
+{{- end -}}
+{{- end -}}

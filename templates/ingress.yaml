@@ -1,6 +1,4 @@
-{{- if .Values.ingress.enabled -}}
-{{- $uiSvcPort := .Values.ui.service.port -}}
-{{- $apiSvcPort := .Values.api.service.port -}}
+{{- if and .Values.ingress.enabled .Values.enableUI -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -35,11 +33,11 @@ spec:
       - path: "/"
         backend:
           serviceName: {{ include "iceci.fullname" $ }}-ui
-          servicePort: {{ $uiSvcPort }}
+          servicePort: 80
       - path: "/api/"
         backend:
           serviceName: {{ include "iceci.fullname" $ }}-api
-          servicePort: {{ $apiSvcPort }}
+          servicePort: 80
         {{- end }}
 {{- else }}
   - http:
@@ -47,10 +45,10 @@ spec:
       - path: "/"
         backend:
           serviceName: {{ include "iceci.fullname" $ }}-ui
-          servicePort: {{ $uiSvcPort }}
+          servicePort: 80
       - path: "/api/"
         backend:
           serviceName: {{ include "iceci.fullname" $ }}-api
-          servicePort: {{ $apiSvcPort }}
+          servicePort: 80
 {{- end }}
 {{- end }}

@@ -1,4 +1,4 @@
-{{- if and .Values.iceciOperator.persistence.dynamicVolume.hostPath (not .Values.iceciOperator.persistence.dynamicVolume.existingClaim) -}}
+{{- if and .Values.storage.dynamicVolume.hostPath (not .Values.storage.dynamicVolume.existingClaim) -}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -10,8 +10,8 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.iceciOperator.persistence.dynamicVolume.size }}
+    storage: {{ .Values.storage.dynamicVolume.size }}
   hostPath:
-    path: {{ .Values.iceciOperator.persistence.dynamicVolume.hostPath | quote }}
+    path: {{ .Values.storage.dynamicVolume.hostPath | quote }}
     type: DirectoryOrCreate
 {{- end -}}

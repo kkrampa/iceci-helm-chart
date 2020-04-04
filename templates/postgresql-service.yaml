@@ -1,0 +1,31 @@
+{{- if and .Values.postgresql.enable .Values.enableUI -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "iceci.fullname" . }}-postgresql-headless
+  labels:
+   {{- include "iceci.labels" . | nindent 4 }}
+spec:
+  clusterIP: "None"
+  ports:
+  - port: {{ .Values.database.port }}
+    targetPort: {{ .Values.database.port }}
+    protocol: TCP
+  selector:
+  {{- include "iceci.postgresql.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "iceci.fullname" . }}-postgresql
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.database.port }}
+      targetPort: {{ .Values.database.port }}
+      protocol: TCP
+  selector:
+    {{- include "iceci.postgresql.selectorLabels" . | nindent 4 }}
+{{- end -}}

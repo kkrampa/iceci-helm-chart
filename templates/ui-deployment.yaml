@@ -1,3 +1,4 @@
+{{- if and .Values.ui.enabled .Values.enableUI }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,11 +9,11 @@ spec:
   replicas: {{ .Values.ui.replicaCount }}
   selector:
     matchLabels:
-      {{- include "iceci.selectorLabels" . | nindent 6 }}
+      {{- include "iceci.ui.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "iceci.selectorLabels" . | nindent 8 }}
+        {{- include "iceci.ui.selectorLabels" . | nindent 8 }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -22,7 +23,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: main
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.ui.image.repository }}:{{ .Chart.AppVersion }}"
@@ -53,3 +54,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+{{- end -}}

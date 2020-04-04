@@ -1,3 +1,4 @@
+{{- if and .Values.ui.enabled  .Values.enableUI }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -5,11 +6,12 @@ metadata:
   labels:
     {{- include "iceci.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.ui.service.type }}
+  type: ClusterIP
   ports:
-    - port: {{ .Values.ui.service.port }}
+    - port: 80
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{- include "iceci.selectorLabels" . | nindent 4 }}
+    {{- include "iceci.ui.selectorLabels" . | nindent 4 }}
+{{- end -}}

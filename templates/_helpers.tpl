@@ -13,13 +13,13 @@ If release name contains chart name it will be used as a full name.
 */}}
 {{- define "iceci.fullname" -}}
 {{- if .Values.fullnameOverride -}}
-{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- .Values.fullnameOverride | trunc 40 | trimSuffix "-" -}}
 {{- else -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- if contains $name .Release.Name -}}
-{{- .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- .Release.Name | trunc 40 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 40 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}
@@ -51,8 +51,18 @@ app.kubernetes.io/name: {{ include "iceci.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
+{{- define "iceci.ui.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "iceci.name" . }}-ui
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
 {{- define "iceci.api.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "iceci.name" . }}-api
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "iceci.postgresql.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "iceci.name" . }}-postgresql
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
@@ -78,7 +88,7 @@ Create the name of the service account to use
 {{- end -}}
 
 {{- define "iceci.stepFullname" -}}
-{{- printf "%s-step" (include "iceci.fullname" .) | trunc 58 | trimSuffix "-"    -}}
+{{- printf "%s-step" (include "iceci.fullname" .)  -}}
 {{- end -}}
 
 {{- define "iceci.stepServiceAccountName" -}}
@@ -91,19 +101,28 @@ Create the name of the service account to use
 
 {{- define "iceci.databaseEnvs" -}}
 - name: ICECI_DB_USER
-  value: {{ .Values.global.postgresqlUsername }}
+  value: {{ required ".Values.database.user" .Values.database.user }}
 - name: ICECI_DB_HOST
-{{- if and .Values.postgresql.install (not .Values.database.host) }}
-  value: {{ .Release.Name }}-postgresql
+{{- if .Values.database.host }}
+  value: {{ .Values.database.host }}
 {{- else }}
-  value: {{ required ".Values.database.host" .Values.database.host }}
+  value: {{ include "iceci.fullname" . }}-postgresql
 {{- end }}
 - name: ICECI_DB_NAME
-  value: {{ .Values.global.postgresqlDatabase }}
+  value: {{ required ".Values.database.dbName" .Values.database.dbName }}
 - name: ICECI_DB_PASS
-  value: {{ .Values.global.postgresqlPassword }}
+  value: {{ required ".Values.database.password" .Values.database.password }}
 - name: ICECI_DB_PORT
-  value: {{ .Values.database.port | quote }}
+  value: {{ required ".Values.database.port" .Values.database.port | quote }}
 - name: ICECI_DB_DIALECT
-  value: {{ .Values.database.type }}
+  value: "postgres"
+{{- end -}}
+
+{{- define "iceci.dockerBuildEnvs" -}}
+- name: ICE_IMAGE_KANIKO
+  value: "gcr.io/kaniko-project/executor:v0.16.0"
+- name: ICE_IMAGE_BUILDKIT
+  value: "moby/buildkit:v0.6.4-rootless"
+- name: ICE_IMAGE_UTILS
+  value: "iceci/utils-arm:2"
 {{- end -}}

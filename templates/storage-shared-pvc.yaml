@@ -1,0 +1,30 @@
+{{- if not .Values.storage.sharedVolume.existingClaim -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+{{- if .Values.storage.sharedVolume.annotations }}
+  annotations:
+{{ toYaml .Values.storage.sharedVolume.annotations | indent 4 }}
+{{- end }}
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+  name: {{ template "iceci.fullname" . }}-shared
+spec:
+  accessModes:
+    - ReadWriteMany
+{{- if .Values.storage.sharedVolume.storageClass }}
+{{- if (eq "-" .Values.storage.sharedVolume.storageClass) }}
+  storageClassName: ""
+{{- else }}
+  storageClassName: {{ .Values.storage.sharedVolume.storageClass | quote }}
+{{- end }}
+{{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.storage.sharedVolume.size | quote }}
+  {{- if .Values.storage.sharedVolume.hostPath }}
+  selector:
+    matchLabels:
+      name: {{ template "iceci.fullname" . }}-shared
+  {{- end -}}
+{{- end -}}

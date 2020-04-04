@@ -25,7 +25,7 @@ serviceAccount:
 
 ingress:
   # Specified whether a ingress should be created
-  enabled: false
+  enabled: true
   annotations: {}
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
@@ -36,19 +36,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-global:
-  postgresql:
-    postgresqlUsername: user
-    postgresqlPassword: pass
-    postgresqlDatabase: iceci
-
 database:
+  # if specified, postgresql will not be deployed
+  host:
   dbName: iceci
   user: user
   password: pass
-  # host:
   port: 5432
-  type: postgres
 
 podSecurityContext: {}
 # fsGroup: 2000
@@ -75,10 +69,31 @@ resources: {}
 #   memory: 128Mi
 
 nodeSelector: {}
-
 tolerations: []
-
 affinity: {}
+
+storage:
+  sharedVolume:
+    annotations: {}
+    storageClass: "-"
+    size: 1Gi
+
+    ## A manually managed Persistent Volume Claim
+    ## If defined, PVC must be created manually before volume will be bound
+    ##
+    existingClaim:
+    hostPath:
+
+  dynamicVolume:
+    annotations: {}
+    storageClass: "-"
+    size: 1Gi
+
+    ## A manually managed Persistent Volume Claim
+    ## If defined, PVC must be created manually before volume will be bound
+    ##
+    existingClaim:
+    hostPath:
 
 iceciOperator:
   enabled: true
@@ -88,29 +103,6 @@ iceciOperator:
     pullPolicy: IfNotPresent
 
   persistence:
-    sharedVolume:
-      annotations: {}
-      # storageClass: "-"
-      size: 1Gi
-
-      ## A manually managed Persistent Volume Claim
-      ## If defined, PVC must be created manually before volume will be bound
-      ##
-      # existingClaim:
-
-      # hostPath: /iceci/shared-storage
-
-    dynamicVolume:
-      annotations: {}
-      # storageClass: "-"
-      size: 1Gi
-
-      ## A manually managed Persistent Volume Claim
-      ## If defined, PVC must be created manually before volume will be bound
-      ##
-      # existingClaim:
-
-      # hostPath: /iceci/dynamic-storage
 
 ui:
   enabled: true
@@ -118,10 +110,6 @@ ui:
   image:
     repository: docker.io/iceci/iceci-ui
     pullPolicy: IfNotPresent
-
-  service:
-    type: ClusterIP
-    port: 80
 
 
 api:
@@ -131,10 +119,6 @@ api:
     repository: docker.io/iceci/iceci-api
     pullPolicy: IfNotPresent
 
-  service:
-    type: ClusterIP
-    port: 80
-
 sync:
   enabled: true
   replicaCount: 1
@@ -143,13 +127,18 @@ sync:
     pullPolicy: IfNotPresent
 
 
-
-## Configuration values for the postgresql dependency.
-## ref: https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md
-##
 postgresql:
-  install: true
-  persistence:
-    enabled: true
+  enable: true
+  image:
+    repository: docker.io/postgres
+    tag: 11
+    pullPolicy: IfNotPresent
 
+  persistence:
+    annotations: {}
+    # if set to "-"  the storage class name will be zero out
+    storageClass:
+    size: 1Gi
+    existingClaim:
+    hostPath:
 
