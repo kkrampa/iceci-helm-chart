@@ -124,7 +124,7 @@ Create the name of the service account to use
 - name: ICE_IMAGE_KANIKO
   value: "gcr.io/kaniko-project/executor:v0.16.0"
 - name: ICE_IMAGE_BUILDKIT
-  value: "moby/buildkit:v0.6.4-rootless"
+  value: "moby/buildkit:v0.7.0"
 - name: ICE_IMAGE_UTILS
-  value: "iceci/utils-arm:2"
+  value: "iceci/utils:2"
 {{- end -}}
