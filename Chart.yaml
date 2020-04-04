@@ -20,6 +20,8 @@ version: 0.1.0
 # incremented each time you make changes to the application.
 appVersion: alpha4
 
+home: iceci.io
+
 dependencies:
   - name: postgresql
     version: 8.6.13
