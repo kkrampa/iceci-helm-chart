@@ -77,9 +77,21 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{- define "iceci.stepFullname" -}}
+{{- printf "%s-step" (include "iceci.fullname" .) | trunc 58 | trimSuffix "-"    -}}
+{{- end -}}
+
+{{- define "iceci.stepServiceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+    {{ default (include "iceci.stepFullname" .) .Values.serviceAccount.stepName }}
+{{- else -}}
+    {{ default "default" .Values.serviceAccount.stepName }}
+{{- end -}}
+{{- end -}}
+
 {{- define "iceci.databaseEnvs" -}}
 - name: ICECI_DB_USER
-  value: {{ .Values.database.user }}
+  value: {{ .Values.global.postgresqlUsername }}
 - name: ICECI_DB_HOST
 {{- if and .Values.postgresql.install (not .Values.database.host) }}
   value: {{ .Release.Name }}-postgresql
@@ -87,9 +99,9 @@ Create the name of the service account to use
   value: {{ required ".Values.database.host" .Values.database.host }}
 {{- end }}
 - name: ICECI_DB_NAME
-  value: {{ .Values.database.dbName }}
+  value: {{ .Values.global.postgresqlDatabase }}
 - name: ICECI_DB_PASS
-  value: {{ .Values.database.password }}
+  value: {{ .Values.global.postgresqlPassword }}
 - name: ICECI_DB_PORT
   value: {{ .Values.database.port | quote }}
 - name: ICECI_DB_DIALECT

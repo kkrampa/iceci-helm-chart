@@ -2,92 +2,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-iceciOperator:
-  enabled: true
-  replicaCount: 1
-  image:
-    repository: docker.io/iceci/iceci-operator
-    pullPolicy: IfNotPresent
-
-  persistence:
-    sharedVolume:
-      annotations: {}
-      storageClass: "-"
-      size: 1Gi
-
-      ## A manually managed Persistent Volume Claim
-      ## If defined, PVC must be created manually before volume will be bound
-      ##
-      # existingClaim:
-
-      hostPath: /iceci/shared-storage
-
-    dynamicVolume:
-      annotations: {}
-      storageClass: "-"
-      size: 1Gi
-
-      ## A manually managed Persistent Volume Claim
-      ## If defined, PVC must be created manually before volume will be bound
-      ##
-      # existingClaim:
-
-      hostPath: /iceci/dynamic-storage
-ui:
-  enabled: true
-  replicaCount: 1
-  image:
-    repository: docker.io/iceci/iceci-ui
-    pullPolicy: IfNotPresent
-
-  service:
-    type: ClusterIP
-    port: 80
-
-  ingress:
-    enabled: false
-    annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    hosts:
-      - host: charts.example
-        paths: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-api:
-  enabled: true
-  replicaCount: 1
-  image:
-    repository: docker.io/iceci/iceci-api
-    pullPolicy: IfNotPresent
-
-  service:
-    type: ClusterIP
-    port: 80
-
-  ingress:
-    enabled: false
-    annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    hosts:
-      - host: charts.example
-        paths: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-
-sync:
-  enabled: true
-  replicaCount: 1
-  image:
-    repository: docker.io/iceci/iceci-sync
-    pullPolicy: IfNotPresent
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+enableUI: true
 
 rbac:
   create: true
@@ -99,10 +18,40 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name:
+  # name:
+  # The name of the step pod service account to use.
+  # if not set and create is true, a name is generated using the stepFullname template
+  # stepName:
+
+ingress:
+  # Specified whether a ingress should be created
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+  - host: iceci.local
+  tls: {}
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+global:
+  postgresql:
+    postgresqlUsername: user
+    postgresqlPassword: pass
+    postgresqlDatabase: iceci
+
+database:
+  dbName: iceci
+  user: user
+  password: pass
+  # host:
+  port: 5432
+  type: postgres
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
   # capabilities:
@@ -110,7 +59,7 @@ securityContext: {}
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+# runAsUser: 1000
 
 
 resources: {}
@@ -123,7 +72,7 @@ resources: {}
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
 nodeSelector: {}
 
@@ -131,40 +80,76 @@ tolerations: []
 
 affinity: {}
 
+iceciOperator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: docker.io/iceci/iceci-operator
+    pullPolicy: IfNotPresent
+
+  persistence:
+    sharedVolume:
+      annotations: {}
+      # storageClass: "-"
+      size: 1Gi
+
+      ## A manually managed Persistent Volume Claim
+      ## If defined, PVC must be created manually before volume will be bound
+      ##
+      # existingClaim:
+
+      # hostPath: /iceci/shared-storage
+
+    dynamicVolume:
+      annotations: {}
+      # storageClass: "-"
+      size: 1Gi
+
+      ## A manually managed Persistent Volume Claim
+      ## If defined, PVC must be created manually before volume will be bound
+      ##
+      # existingClaim:
+
+      # hostPath: /iceci/dynamic-storage
+
+ui:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: docker.io/iceci/iceci-ui
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+
+api:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: docker.io/iceci/iceci-api
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+sync:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: docker.io/iceci/iceci-sync
+    pullPolicy: IfNotPresent
+
+
+
 ## Configuration values for the postgresql dependency.
 ## ref: https://github.com/kubernetes/charts/blob/master/stable/postgresql/README.md
 ##
 postgresql:
-
-  ### Install PostgreSQL dependency
-  ##
   install: true
-
-  ### PostgreSQL User to create.
-  ##
-  postgresqlUsername: user
-
-  ## PostgreSQL Password for the new user.
-  ## If not set, a random 10 characters password will be used.
-  ##
-  postgresqlPassword: pass
-
-  ## PostgreSQL Database to create.
-  ##
-  postgresqlDatabase: iceci
-
-  ## Persistent Volume Storage configuration.
-  ## ref: https://kubernetes.io/docs/user-guide/persistent-volumes
-  ##
   persistence:
-    ## Enable PostgreSQL persistence using Persistent Volume Claims.
-    ##
     enabled: true
 
-database:
-  dbName: iceci
-  user: user
-  password: pass
-  # host:
-  port: 5432
-  type: postgres
+
