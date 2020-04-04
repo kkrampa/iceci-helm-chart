@@ -1,5 +1,5 @@
 steps:
-  - name: build-push-result-test
+  - name: lint chart
     dockerRun:
       image: quay.io/helmpack/chart-testing:v3.0.0-rc.1
       script: "ct lint"
