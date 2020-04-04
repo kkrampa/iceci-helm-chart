@@ -1,0 +1,17 @@
+{{- if and .Values.iceciOperator.persistence.sharedVolume.hostPath (not .Values.iceciOperator.persistence.sharedVolume.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+    name: {{ template "iceci.fullname" . }}-shared
+  name: {{ template "iceci.fullname" . }}-shared
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ .Values.iceciOperator.persistence.sharedVolume.size }}
+  hostPath:
+    path: {{ .Values.iceciOperator.persistence.sharedVolume.hostPath | quote }}
+    type: DirectoryOrCreate
+{{- end -}}

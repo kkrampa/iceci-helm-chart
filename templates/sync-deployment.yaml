@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iceci.fullname" . }}-sync
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.sync.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "iceci.sync.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "iceci.sync.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "iceci.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.sync.image.repository }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          env:
+            {{- include "iceci.databaseEnvs" . | nindent 12 }}
+            - name: ICE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "iceci-sync"
+            - name: ICE_DYNAMIC_PVC
+              value: {{ include "iceci.fullname" . }}-dynamic
+            - name: ICE_SHARED_PVC
+              value: {{ include "iceci.fullname" . }}-shared
+            - name: ICE_IMAGE_KANIKO
+              value: "gcr.io/kaniko-project/executor:v0.16.0"
+            - name: ICE_IMAGE_BUILDKIT
+              value: "moby/buildkit:v0.6.4-rootless"
+            - name: ICE_IMAGE_UTILS
+              value: "iceci/utils-arm:2"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

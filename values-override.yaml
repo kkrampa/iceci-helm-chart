@@ -1,0 +1,22 @@
+ui:
+  ingress:
+    enabled: true
+    hosts:
+      - host: null
+        paths:
+          - /*
+
+api:
+  ingress:
+    enabled: true
+    hosts:
+      - host: null
+        paths:
+          - /api/*
+
+iceciOperator:
+  persistence:
+    sharedVolume:
+      hostPath: /home/kkrampa/shared-storage
+    dynamicVolume:
+      hostPath: /home/kkrampa/dynamic-storage

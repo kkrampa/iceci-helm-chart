@@ -1,0 +1,17 @@
+{{- if and .Values.iceciOperator.persistence.dynamicVolume.hostPath (not .Values.iceciOperator.persistence.dynamicVolume.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    {{- include "iceci.labels" . | nindent 4 }}
+    name: {{ template "iceci.fullname" . }}-dynamic
+  name: {{ template "iceci.fullname" . }}-dynamic
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ .Values.iceciOperator.persistence.dynamicVolume.size }}
+  hostPath:
+    path: {{ .Values.iceciOperator.persistence.dynamicVolume.hostPath | quote }}
+    type: DirectoryOrCreate
+{{- end -}}
