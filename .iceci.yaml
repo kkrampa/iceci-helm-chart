@@ -1,0 +1,10 @@
+steps:
+  - name: build-push-result-test
+    dockerRun:
+      image: quay.io/helmpack/chart-testing:v3.0.0-rc.1
+      script: "ct lint"
+      environment:
+        - name: CT_CHARTS
+          value: .
+        - name: CT_CHART_REPOS
+          value: bitnami=https://charts.bitnami.com/bitnami
