@@ -58,6 +58,8 @@ spec:
               required:
               - repositoryURL
               type: object
+            pipelineFilePath:
+              type: string
           required:
           - git
           type: object

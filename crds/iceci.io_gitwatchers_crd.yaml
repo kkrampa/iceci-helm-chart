@@ -54,6 +54,8 @@ spec:
               type: object
             orphanPipelines:
               type: boolean
+            pipelineFilePath:
+              type: string
             schedule:
               type: string
           required:
