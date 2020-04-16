@@ -12,6 +12,6 @@ spec:
   capacity:
     storage: {{ .Values.storage.dynamicVolume.size }}
   hostPath:
-    path: {{ .Values.storage.dynamicVolume.hostPath | quote }}
+    path: {{ required "dynamic.hostPath" .Values.storage.dynamicVolume.hostPath | quote }}
     type: DirectoryOrCreate
 {{- end -}}

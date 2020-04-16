@@ -13,6 +13,6 @@ spec:
   capacity:
     storage: {{ .Values.storage.sharedVolume.size }}
   hostPath:
-    path: {{ .Values.storage.sharedVolume.hostPath | quote }}
+    path: {{ required "shared.hostPath" .Values.storage.sharedVolume.hostPath | quote }}
     type: DirectoryOrCreate
 {{- end -}}

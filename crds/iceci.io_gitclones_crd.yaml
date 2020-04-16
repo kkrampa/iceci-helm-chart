@@ -1,21 +1,20 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: backingservices.icekube.io
+  name: gitclones.iceci.io
 spec:
   additionalPrinterColumns:
   - JSONPath: .status.phase
     description: Phase
     format: byte
     name: phase
-    priority: 1
     type: string
-  group: icekube.io
+  group: iceci.io
   names:
-    kind: BackingService
-    listKind: BackingServiceList
-    plural: backingservices
-    singular: backingservice
+    kind: GitClone
+    listKind: GitCloneList
+    plural: gitclones
+    singular: gitclone
   scope: Namespaced
   subresources:
     status: {}
@@ -36,57 +35,61 @@ spec:
           type: object
         spec:
           properties:
-            dockerSecret:
+            getMetadata:
+              type: boolean
+            git:
               properties:
-                secretName:
-                  description: Name of kubernetes secret
+                auth:
+                  properties:
+                    secret:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                  - secret
+                  - type
+                  type: object
+                checkout:
+                  type: string
+                repositoryURL:
                   type: string
               required:
-              - secretName
+              - repositoryURL
               type: object
-            environment:
-              items:
-                properties:
-                  fromSecret:
-                    type: string
-                  name:
-                    type: string
-                  value:
-                    type: string
-                required:
-                - name
-                type: object
-              type: array
-            hosts:
-              additionalProperties:
-                type: string
-              type: object
-            image:
-              type: string
-            imagePullSecret:
-              type: string
-            nodeSelector:
-              additionalProperties:
-                type: string
-              type: object
-            resourceRequest:
+            volume:
               properties:
-                cpu:
+                pvcName:
                   type: string
-                memory:
+                subPath:
                   type: string
+              required:
+              - pvcName
               type: object
-            script:
-              type: string
-            serviceName:
-              pattern: ^[a-z]+[a-z\-_0-9]+$
-              type: string
           required:
-          - image
-          - serviceName
+          - git
+          - volume
           type: object
         status:
           properties:
+            checkoutMetadata:
+              properties:
+                authorDate:
+                  type: string
+                authorEmail:
+                  type: string
+                authorName:
+                  type: string
+                commitHash:
+                  type: string
+                logHeader:
+                  type: string
+                logMessage:
+                  type: string
+                reflogEmail:
+                  type: string
+                reflogName:
+                  type: string
+              type: object
             duration:
               format: int32
               type: integer
@@ -98,15 +101,7 @@ spec:
               type: string
             message:
               type: string
-            pendingDuration:
-              format: int32
-              type: integer
-            pendingStartedTime:
-              format: date-time
-              type: string
             phase:
-              type: string
-            podIP:
               type: string
             podStatus:
               properties:

@@ -51,8 +51,8 @@ securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
+# readOnlyRootFilesystem: true
+# runAsNonRoot: true
 # runAsUser: 1000
 
 
@@ -64,8 +64,8 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
+# requests:
+#   cpu: 100m
 #   memory: 128Mi
 
 nodeSelector: {}
@@ -96,11 +96,15 @@ storage:
     hostPath:
 
 iceciOperator:
+  config:
+    # this can be changed for buildkit
+    # kaniko is recommended, however on arm32 and arm64 only buildkit works
+    defaultBuilder: "kaniko"
   enabled: true
   replicaCount: 1
   image:
     repository: docker.io/iceci/iceci-operator
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   persistence:
 
@@ -109,7 +113,7 @@ ui:
   replicaCount: 1
   image:
     repository: docker.io/iceci/iceci-ui
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
 
 api:
@@ -117,14 +121,14 @@ api:
   replicaCount: 1
   image:
     repository: docker.io/iceci/iceci-api
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
 sync:
   enabled: true
   replicaCount: 1
   image:
     repository: docker.io/iceci/iceci-sync
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
 
 postgresql:
@@ -132,7 +136,7 @@ postgresql:
   image:
     repository: docker.io/postgres
     tag: 11
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   persistence:
     annotations: {}

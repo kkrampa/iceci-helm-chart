@@ -1,36 +1,19 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: workspaces.icekube.io
+  name: tensorboards.iceai.io
 spec:
-  additionalPrinterColumns:
-  - JSONPath: .status.phase
-    description: Phase
-    format: byte
-    name: phase
-    type: string
-  - JSONPath: .status.volume.pvcName
-    description: PVCName
-    format: byte
-    name: pvcname
-    type: string
-  - JSONPath: .status.volume.subPath
-    description: SubPath
-    format: byte
-    name: subpath
-    type: string
-  group: icekube.io
+  group: iceai.io
   names:
-    kind: Workspace
-    listKind: WorkspaceList
-    plural: workspaces
-    singular: workspace
+    kind: Tensorboard
+    listKind: TensorboardList
+    plural: tensorboards
+    singular: tensorboard
   scope: Namespaced
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: Workspace generator
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -46,13 +29,10 @@ spec:
           type: object
         spec:
           properties:
-            storageType:
-              enum:
-              - dynamic
-              - shared
+            storagePVC:
               type: string
           required:
-          - storageType
+          - storagePVC
           type: object
         status:
           properties:
@@ -60,17 +40,10 @@ spec:
               type: string
             phase:
               type: string
+            podName:
+              type: string
             reason:
               type: string
-            volume:
-              properties:
-                pvcName:
-                  type: string
-                subPath:
-                  type: string
-              required:
-              - pvcName
-              type: object
           type: object
       type: object
   version: v1alpha1

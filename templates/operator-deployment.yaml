@@ -44,6 +44,8 @@ spec:
             value: {{ include "iceci.fullname" . }}-dynamic
           - name: ICE_SHARED_PVC
             value: {{ include "iceci.fullname" . }}-shared
+          - name:  DEFAULT_IMAGE_BUILDER
+            value: {{ .Values.iceciOperator.config.defaultBuilder }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
