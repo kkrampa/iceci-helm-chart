@@ -41,9 +41,17 @@ spec:
           - name: OPERATOR_NAME
             value: "iceci-operator"
           - name: ICE_DYNAMIC_PVC
+            {{- if .Values.storage.dynamicVolume.existingClaim }}
+            value: {{ .Values.storage.dynamicVolume.existingClaim  }}
+            {{- else }}
             value: {{ include "iceci.fullname" . }}-dynamic
+            {{- end }}
           - name: ICE_SHARED_PVC
+            {{- if .Values.storage.sharedVolume.existingClaim }}
+            value: {{ .Values.storage.sharedVolume.existingClaim  }}
+            {{- else }}
             value: {{ include "iceci.fullname" . }}-shared
+            {{- end }}
           - name:  DEFAULT_IMAGE_BUILDER
             value: {{ .Values.iceciOperator.config.defaultBuilder }}
           resources:
