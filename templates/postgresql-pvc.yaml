@@ -1,11 +1,11 @@
 {{- if and .Values.postgresql.enable .Values.enableUI -}}
-{{- if not .Values.storage.dynamicVolume.existingClaim -}}
+{{- if not .Values.postgresql.persistence.existingClaim -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-{{- if .Values.storage.dynamicVolume.annotations }}
+{{- if .Values.postgresql.persistence.annotations }}
   annotations:
-{{ toYaml .Values.storage.dynamicVolume.annotations | indent 4 }}
+{{ toYaml .Values.postgresql.persistence.annotations | indent 4 }}
 {{- end }}
   labels:
     {{- include "iceci.labels" . | nindent 4 }}
@@ -23,7 +23,7 @@ spec:
   resources:
     requests:
       storage: {{ .Values.storage.dynamicVolume.size | quote }}
-  {{- if .Values.storage.dynamicVolume.hostPath }}
+  {{- if.Values.postgresql.persistence.hostPath }}
   selector:
     matchLabels:
       name: {{ template "iceci.fullname" . }}-postgresql

@@ -126,5 +126,5 @@ Create the name of the service account to use
 - name: ICE_IMAGE_BUILDKIT
   value: "moby/buildkit:v0.7.0"
 - name: ICE_IMAGE_UTILS
-  value: "iceci/utils:2"
+  value: "iceci/utils"
 {{- end -}}

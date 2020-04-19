@@ -235,6 +235,7 @@ spec:
                           tags:
                             items:
                               type: string
+                            minItems: 1
                             type: array
                           user:
                             type: string
