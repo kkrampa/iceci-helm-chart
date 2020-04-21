@@ -13,9 +13,7 @@ spec:
   accessModes:
     - ReadWriteMany
 {{- if .Values.storage.sharedVolume.storageClass }}
-{{- if (eq "-" .Values.storage.sharedVolume.storageClass) }}
-  storageClassName: ""
-{{- else }}
+{{- if not (eq "-" .Values.storage.sharedVolume.storageClass) }}
   storageClassName: {{ .Values.storage.sharedVolume.storageClass | quote }}
 {{- end }}
 {{- end }}
